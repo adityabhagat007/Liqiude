@@ -6,7 +6,7 @@ import {
 } from '@mui/material';
 import Navbar from '../components/Navbar';
 
-const PublicLayout = ({ children }) => {
+const Layout = ({ children }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', margin: 0, padding: 0 }}>
       {/* Navbar */}
@@ -49,4 +49,4 @@ const PublicLayout = ({ children }) => {
   );
 };
 
-export default PublicLayout;
+export default Layout;

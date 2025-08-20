@@ -1,45 +1,29 @@
-import PublicLayout from '../layouts/publicLayout';
+import Layout from '../layouts/Layout';
 import Login from '../pages/login';
 import Dashboard from '../pages/Dashboard';
+import BasketDetails from '../pages/BasketDetails';
+import HomePage from '../pages/homePage';
+import SubscribePage from '../pages/SubscribePage';
+import MandatePage from '../pages/mandatePage'; 
+import { lazy } from 'react';
+
+const Homepage = lazy(() => import('../pages/homePage'));
+const Loginpage = lazy(() => import('../pages/login'));
+const Dashboardpage = lazy(() => import('../pages/Dashboard'));
+const BasketDetailspage = lazy(() => import('../pages/BasketDetails'));
+const Subscribepage = lazy(() => import('../pages/SubscribePage'));
+const Mandatepage = lazy(() => import('../pages/mandatePage'));
 
 // Public route configuration
 export const publicRoutes = [
   {
     path: "/",
-    element: (
-      <PublicLayout>
-        <div>Home Page (Public)</div>
-      </PublicLayout>
-    ),
-  },
-  {
-    path: "/baskets",
-    element: (
-      <PublicLayout>
-        <div>Baskets Page (Public)</div>
-      </PublicLayout>
-    ),
+    element: <Homepage />,
   },
   {
     path: "/login",
-    element: <Login />,
+    element: <Loginpage />,
   },
-  {
-    path: "/register",
-    element: (
-      <PublicLayout>
-        <div>Register Page (Public)</div>
-      </PublicLayout>
-    ),
-  },
-  {
-    path: "/about",
-    element: (
-      <PublicLayout>
-        <div>About Page (Public)</div>
-      </PublicLayout>
-    ),
-  }
 ];
 
 // Private route configuration
@@ -47,27 +31,35 @@ export const privateRoutes = [
   {
     path: "/dashboard",
     element: (
-      <PublicLayout>
-        <Dashboard />
-      </PublicLayout>
+      <Layout>
+        <Dashboardpage />
+      </Layout>
     ),
   },
   {
-    path: "/profile",
+    path: "/basket/:id",
     element: (
-      <PublicLayout>
-        <div>Profile Page (Private)</div>
-      </PublicLayout>
+      <Layout>
+        <BasketDetailspage />
+      </Layout>
     ),
   },
   {
-    path: "/settings",
+    path: "/subscribe/:basketId",
     element: (
-      <PublicLayout>
-        <div>Settings Page (Private)</div>
-      </PublicLayout>
+      <Layout>
+        <Subscribepage />   
+      </Layout>
     ),
-  }
+  },
+  {
+    path: "/mandate",
+    element: (
+      <Layout>
+        <Mandatepage />
+      </Layout>
+    ),
+  },
 ];
 
 

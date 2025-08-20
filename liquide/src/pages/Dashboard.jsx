@@ -10,7 +10,8 @@ import {
   Alert
 } from '@mui/material';
 import { protectedAPI } from '../services/api';
-import BasketCard from './card';
+import BasketCard from '../components/Cards/BasketCard';
+import InvestmentCard from '../components/Cards/InvestmentCard';
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -27,24 +28,17 @@ const Dashboard = () => {
       setLoading(true);
       setError('');
 
-      // First, call investment API
-      const investmentResponse = await protectedAPI.getInvestments();
-      console.log('Investment API Response:', investmentResponse);
+      // Always fetch both investment and basket data
+      const [investmentResponse, basketResponse] = await Promise.all([
+        protectedAPI.getInvestments(),
+        protectedAPI.getBaskets()
+      ]);
 
-      // Check if investment data is empty
-      if (investmentResponse.status === 'success' && 
-          investmentResponse.code === 200 && 
-          (!investmentResponse.data || investmentResponse.data.length === 0)) {
-        
-        console.log('Investment data is empty, calling basket API...');
-        
-        // Call get basket API
-        const basketResponse = await protectedAPI.getBaskets();
-        console.log('Basket API Response:', basketResponse);
-        setBasketData(basketResponse);
-      } else {
-        setInvestmentData(investmentResponse);
-      }
+      console.log('Investment API Response:', investmentResponse);
+      console.log('Basket API Response:', basketResponse);
+
+      setInvestmentData(investmentResponse);
+      setBasketData(basketResponse);
 
     } catch (error) {
       console.error('Dashboard data fetch error:', error);
@@ -75,82 +69,78 @@ const Dashboard = () => {
         </Typography>
       </Box>
 
-      {/* Error Alert */}
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
           {error}
         </Alert>
       )}
 
-      <Grid container spacing={3}>
-        {/* Investment Data Card */}
-        {investmentData && (
-          <Grid item xs={12}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" sx={{ mb: 2, color: '#1e3a8a' }}>
-                  Investment Data
+      <Grid container spacing={4}>
+        {/* Investment Section */}
+        <Grid item xs={12}>
+          <Typography variant="h5" sx={{ fontWeight: 600, color: '#1e3a8a', mb: 3 }}>
+            Your Investments
+          </Typography>
+          
+          {investmentData && investmentData.data && investmentData.data.length > 0 ? (
+            <Grid container spacing={3}>
+              {investmentData.data.map((investment, index) => (
+                <Grid item xs={12} lg={6} key={investment.basketId || index}>
+                  <InvestmentCard investment={investment} />
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            <Card sx={{ 
+              borderRadius: 3, 
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', 
+              border: '1px solid rgba(0, 0, 0, 0.05)',
+              backgroundColor: '#f8fafc'
+            }}>
+              <CardContent sx={{ p: 4, textAlign: 'center' }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: '#64748b', mb: 2 }}>
+                  You haven't invested yet
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Status: {investmentData.status} | Code: {investmentData.code}
+                <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+                  Start your investment journey by exploring our curated baskets below
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Data Items: {investmentData.data?.length || 0}
-                </Typography>
-                {investmentData.data && investmentData.data.length > 0 && (
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="body2">
-                      <strong>Investment Details:</strong>
-                    </Typography>
-                    <pre style={{ fontSize: '12px', overflow: 'auto' }}>
-                      {JSON.stringify(investmentData.data, null, 2)}
-                    </pre>
-                  </Box>
-                )}
               </CardContent>
             </Card>
-          </Grid>
-        )}
+          )}
+        </Grid>
 
-        {/* Basket Data Cards */}
-        {basketData && basketData.data && basketData.data.length > 0 && (
-          <>
-            {basketData.data.map((basket, index) => (
-              <Grid item xs={12} md={6} lg={4} key={basket.id || index}>
-                <BasketCard basket={basket} />
-              </Grid>
-            ))}
-          </>
-        )}
-
-        {/* Basket Data Raw Display (if needed) */}
-        {basketData && (!basketData.data || basketData.data.length === 0) && (
-          <Grid item xs={12}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" sx={{ mb: 2, color: '#1e3a8a' }}>
-                  Basket Data (Fetched after empty investment)
+        {/* Basket Section */}
+        <Grid item xs={12}>
+          <Typography variant="h5" sx={{ fontWeight: 600, color: '#1e3a8a', mb: 3, mt: 2 }}>
+            Available Baskets
+          </Typography>
+          
+          {basketData && basketData.data && basketData.data.length > 0 ? (
+            <Grid container spacing={3}>
+              {basketData.data.map((basket, index) => (
+                <Grid item xs={12} md={6} lg={4} key={basket.id || index}>
+                  <BasketCard basket={basket} />
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            <Card sx={{ 
+              borderRadius: 3, 
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', 
+              border: '1px solid rgba(0, 0, 0, 0.05)',
+              backgroundColor: '#f8fafc'
+            }}>
+              <CardContent sx={{ p: 4, textAlign: 'center' }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, color: '#64748b', mb: 2 }}>
+                  No baskets available
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Status: {basketData.status} | Code: {basketData.code}
+                <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+                  Check back later for new investment opportunities
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Data Items: {basketData.data?.length || 0}
-                </Typography>
-                {basketData.data && basketData.data.length > 0 && (
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="body2">
-                      <strong>Basket Details:</strong>
-                    </Typography>
-                    <pre style={{ fontSize: '12px', overflow: 'auto' }}>
-                      {JSON.stringify(basketData.data, null, 2)}
-                    </pre>
-                  </Box>
-                )}
               </CardContent>
             </Card>
-          </Grid>
-        )}
+          )}
+        </Grid>
       </Grid>
     </Container>
   );

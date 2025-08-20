@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Card,
   CardContent,
@@ -8,8 +9,11 @@ import {
   Chip
 } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import { ROUTES } from '../../utils/config';
 
 const BasketCard = ({ basket }) => {
+  const navigate = useNavigate();
+
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -21,6 +25,12 @@ const BasketCard = ({ basket }) => {
 
   const formatPercentage = (value) => {
     return `${value > 0 ? '+' : ''}${value.toFixed(1)}%`;
+  };
+
+  const handleInvestClick = () => {
+    if (basket.id) {
+      navigate(`${ROUTES.BASKET_DETAILS}/${basket.id}`);
+    }
   };
 
   return (
@@ -174,6 +184,7 @@ const BasketCard = ({ basket }) => {
           variant="contained"
           fullWidth
           size="large"
+          onClick={handleInvestClick}
           sx={{
             py: 1.5,
             borderRadius: 2,

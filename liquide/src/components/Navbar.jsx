@@ -34,8 +34,8 @@ const Navbar = () => {
   };
 
   const menuItems = [
-    { text: 'Dashboard', path: '/' },
-    { text: 'Baskets', path: '/baskets' }
+    { text: 'Dashboard', path: '/dashboard' },
+    { text: 'Profile', path: '/profile' },
   ];
 
   const drawer = (
@@ -68,57 +68,68 @@ const Navbar = () => {
         }}
       >
         <Toolbar sx={{ px: { xs: 2, md: 4 } }}>
+          {/* Logo */}
           <Typography 
             variant="h6" 
             component="div" 
             sx={{ 
-              flexGrow: 1, 
               cursor: 'pointer',
               fontWeight: 600,
-              color: 'white'
+              color: 'white',
+              mr: 4
             }}
             onClick={() => handleNavigation('/')}
           >
-            Liquide
+            Stock Baskets
           </Typography>
           
           {isMobile ? (
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-            >
-              <MenuIcon />
-            </IconButton>
+            <>
+              {/* Mobile: Menu button on right */}
+              <Box sx={{ flexGrow: 1 }} />
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                edge="end"
+                onClick={handleDrawerToggle}
+              >
+                <MenuIcon />
+              </IconButton>
+            </>
           ) : (
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-              {menuItems.map((item) => (
-                <Button
-                  key={item.text}
-                  color="inherit"
-                  onClick={() => handleNavigation(item.path)}
-                  sx={{
-                    color: 'white',
-                    textTransform: 'none',
-                    fontSize: '1rem',
-                    fontWeight: location.pathname === item.path ? 600 : 400,
-                    backgroundColor: location.pathname === item.path ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
-                    borderRadius: '8px',
-                    px: 2,
-                    py: 1,
-                    '&:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.15)'
-                    }
-                  }}
-                >
-                  {item.text}
-                </Button>
-              ))}
+            <>
+              {/* Desktop: Navigation buttons on left */}
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                {menuItems.map((item) => (
+                  <Button
+                    key={item.text}
+                    color="inherit"
+                    onClick={() => handleNavigation(item.path)}
+                    sx={{
+                      color: 'white',
+                      textTransform: 'none',
+                      fontSize: '1rem',
+                      fontWeight: location.pathname === item.path ? 600 : 400,
+                      backgroundColor: location.pathname === item.path ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+                      borderRadius: '8px',
+                      px: 2,
+                      py: 1,
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)'
+                      }
+                    }}
+                  >
+                    {item.text}
+                  </Button>
+                ))}
+              </Box>
               
+              {/* Spacer to push avatar to right */}
+              <Box sx={{ flexGrow: 1 }} />
+              
+              {/* Avatar on right */}
               <Avatar 
                 sx={{ 
-                  ml: 2,
                   width: 36,
                   height: 36,
                   backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -129,7 +140,7 @@ const Navbar = () => {
               >
                 J
               </Avatar>
-            </Box>
+            </>
           )}
         </Toolbar>
       </AppBar>

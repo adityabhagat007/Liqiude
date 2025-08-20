@@ -25,34 +25,6 @@ export const clearStoredData = () => {
 };
 
 
-
-// Add request interceptor to include token for protected requests
-// protectedAxios.interceptors.request.use(
-//   (config) => {
-//     const token = getStoredToken();
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
-
-// Add response interceptor to handle token expiration
-// protectedAxios.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     if (error.response?.status === 401) {
-//       // Token expired or invalid, clear storage and redirect to login
-//       clearStoredData();
-//       window.location.href = '/login';
-//     }
-//     return Promise.reject(error);
-//   }
-// );
-
 // Authentication API functions
 export const authAPI = {
   // Send OTP to phone number
@@ -107,7 +79,6 @@ export const authAPI = {
 
 // Protected API functions
 export const protectedAPI = {
-  // Get investments
   getInvestments: async () => {
     try {
       const response = await PROTECTED_API_REQ.get(PROTECTED_APIS.get_investments);
@@ -116,8 +87,6 @@ export const protectedAPI = {
       throw new Error(error.response?.data?.message || error.message || 'Failed to fetch investments');
     }
   },
-
-  // Get baskets
   getBaskets: async () => {
     try {
       const response = await PROTECTED_API_REQ.get(PROTECTED_APIS.get_baskets);
@@ -126,8 +95,6 @@ export const protectedAPI = {
       throw new Error(error.response?.data?.message || error.message || 'Failed to fetch baskets');
     }
   },
-
-  // Get basket by ID
   getBasketById: async (id) => {
     try {
       const response = await PROTECTED_API_REQ.get(`${PROTECTED_APIS.get_basket_by_id}/${id}`);
@@ -135,7 +102,45 @@ export const protectedAPI = {
     } catch (error) {
       throw new Error(error.response?.data?.message || error.message || 'Failed to fetch basket');
     }
-  }
+  },
+  getBasketDetails: async (id) => {
+    try {
+      const response = await PROTECTED_API_REQ.get(`${PROTECTED_APIS.get_basket_details}/${id}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || error.message || 'Failed to fetch basket details');
+    }
+  },
+  getBasketChart: async (basketId, period) => {
+    try {
+      const response = await PROTECTED_API_REQ.get(PROTECTED_APIS.basket_chart(basketId, period));
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || error.message || 'Failed to fetch basket chart data');
+    }
+  },
+  subscribe: async ({ basketId, plan, units }) => {
+    try {
+      const response = await PROTECTED_API_REQ.post(PROTECTED_APIS.subscribe_basket(basketId), {
+        period: plan,
+        units: units
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || error.message || 'Failed to subscribe');
+    }
+  },
+  submitMandate: async ({ basketId, automaticPayment, rebalancingFrequency }) => {
+    try {
+      const response = await PROTECTED_API_REQ.post(PROTECTED_APIS.submit_mandate(basketId, rebalancingFrequency), {
+        rebalancingFrequency
+      });
+      console.log()
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || error.message || 'Failed to submit mandate');
+    }
+  },
 };
 
 // Check if user is authenticated
