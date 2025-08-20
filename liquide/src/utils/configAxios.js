@@ -1,21 +1,20 @@
 import axios from "axios";
 import { BASE_URL } from "./config";
-
-
+import { getSecureToken } from "./secureStorage";
 
 const authInterceptor = (req) => {
-    const token = localStorage.getItem('authToken')
-    if (token) {
-      req.headers.Authorization = `Bearer ${token}`;
-    }
-    return req;
-  };
+  const token = getSecureToken();
+  if (token) {
+    req.headers.Authorization = `Bearer ${token}`;
+  }
+  return req;
+};
+
 /**
  * *With out token requests
  */
 export const PUBLIC_API_REQ = axios.create({
   baseURL: BASE_URL,
-
 });
 
 /**

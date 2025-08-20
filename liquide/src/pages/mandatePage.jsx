@@ -55,7 +55,6 @@ const MandatePage = () => {
     try {
       const response = await protectedAPI.submitMandate({
         basketId,
-        automaticPayment,
         rebalancingFrequency
       });
 

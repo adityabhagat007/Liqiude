@@ -1,29 +1,14 @@
 
 import { PUBLIC_APIS, PROTECTED_APIS, STORAGE_KEYS } from '../utils/config';
 import { PROTECTED_API_REQ, PUBLIC_API_REQ } from '../utils/configAxios';
-
-// Helper function to get stored token
-const getStoredToken = () => {
-  return localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-};
-
-// Helper function to save access token
-const saveToken = (accessToken) => {
-  localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
-};
-
-// Helper function to save user data
-const saveUserData = (userData) => {
-  localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userData));
-};
-
-// Helper function to clear all stored data
-export const clearStoredData = () => {
-  localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-  localStorage.removeItem(STORAGE_KEYS.USER_DATA);
-  localStorage.removeItem(STORAGE_KEYS.PHONE_NUMBER);
-};
-
+import { 
+  setSecureToken, 
+  setUserData,
+  getUserData,
+  clearSecureStorage,
+  isAuthenticated as checkAuth,
+  setPhoneNumber
+} from '../utils/secureStorage';
 
 // Authentication API functions
 export const authAPI = {
@@ -33,6 +18,10 @@ export const authAPI = {
       const response = await PUBLIC_API_REQ.post(PUBLIC_APIS.login, {
         mobile
       });
+      
+      // Store phone number for OTP verification
+      setPhoneNumber(mobile);
+      
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || error.message || 'Failed to send OTP');
@@ -43,18 +32,20 @@ export const authAPI = {
   verifyOTP: async (phoneNumber, otp) => {
     try {
       const response = await PUBLIC_API_REQ.post(PUBLIC_APIS.verifyOtp, {
-        mobile:phoneNumber,
+        mobile: phoneNumber,
         otp
       });
 
-      // Save token and user data
-    console.log(response.data.data[0],"dfds")
+      console.log(response.data.data[0], "dfds");
+      
+      // Save token securely using HTTP-only cookie
       if (response.data.data[0].accessToken) {
-        saveToken(response.data.data[0].accessToken);
+        setSecureToken(response.data.data[0].accessToken);
       }
       
+      // Save user data in sessionStorage (non-sensitive)
       if (response.data.user) {
-        saveUserData(response.data.user);
+        setUserData(response.data.user);
       }
 
       return response.data;
@@ -71,8 +62,8 @@ export const authAPI = {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      // Always clear local storage on logout
-      clearStoredData();
+      // Always clear secure storage on logout
+      clearSecureStorage();
     }
   }
 };
@@ -130,7 +121,7 @@ export const protectedAPI = {
       throw new Error(error.response?.data?.message || error.message || 'Failed to subscribe');
     }
   },
-  submitMandate: async ({ basketId, automaticPayment, rebalancingFrequency }) => {
+  submitMandate: async ({ basketId, rebalancingFrequency }) => {
     try {
       const response = await PROTECTED_API_REQ.post(PROTECTED_APIS.submit_mandate(basketId, rebalancingFrequency), {
         rebalancingFrequency
@@ -145,17 +136,10 @@ export const protectedAPI = {
 
 // Check if user is authenticated
 export const isAuthenticated = () => {
-  const token = getStoredToken();
-  return !!token;
+  return checkAuth();
 };
 
 // Get stored user data
-export const getUserData = () => {
-  try {
-    const userData = localStorage.getItem(STORAGE_KEYS.USER_DATA);
-    return userData ? JSON.parse(userData) : null;
-  } catch (error) {
-    console.error('Error parsing user data:', error);
-    return null;
-  }
+export const getUserDataFromStorage = () => {
+  return getUserData();
 };
