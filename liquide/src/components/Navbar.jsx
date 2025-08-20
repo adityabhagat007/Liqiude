@@ -12,13 +12,20 @@ import {
   Box,
   useTheme,
   useMediaQuery,
-  Avatar
+  Avatar,
+  Menu,
+  MenuItem,
+  ListItemIcon
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import LogoutIcon from '@mui/icons-material/Logout';
+import PersonIcon from '@mui/icons-material/Person';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { authAPI } from '../services/api';
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
@@ -33,9 +40,30 @@ const Navbar = () => {
     setMobileOpen(false);
   };
 
+  const handleAvatarClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await authAPI.logout();
+      handleMenuClose();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Even if logout API fails, clear local storage and redirect
+      handleMenuClose();
+      navigate('/');
+    }
+  };
+
   const menuItems = [
     { text: 'Dashboard', path: '/dashboard' },
-    { text: 'Profile', path: '/profile' },
+    { text: 'Profile', path: '/dashboard' },
   ];
 
   const drawer = (
@@ -53,6 +81,20 @@ const Navbar = () => {
             <ListItemText primary={item.text} />
           </ListItem>
         ))}
+        <ListItem 
+          button 
+          onClick={handleLogout}
+          sx={{
+            marginTop: 2,
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            color: '#ef4444'
+          }}
+        >
+          <ListItemIcon>
+            <LogoutIcon sx={{ color: '#ef4444' }} />
+          </ListItemIcon>
+          <ListItemText primary="Logout" />
+        </ListItem>
       </List>
     </Box>
   );
@@ -128,18 +170,27 @@ const Navbar = () => {
               <Box sx={{ flexGrow: 1 }} />
               
               {/* Avatar on right */}
-              <Avatar 
-                sx={{ 
-                  width: 36,
-                  height: 36,
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                  color: 'white',
-                  fontSize: '0.875rem',
-                  fontWeight: 600
-                }}
+              <IconButton
+                onClick={handleAvatarClick}
+                sx={{ p: 0 }}
               >
-                J
-              </Avatar>
+                <Avatar 
+                  sx={{ 
+                    width: 36,
+                    height: 36,
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    color: 'white',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.3)'
+                    }
+                  }}
+                >
+                  AD
+                </Avatar>
+              </IconButton>
             </>
           )}
         </Toolbar>
@@ -165,6 +216,51 @@ const Navbar = () => {
       >
         {drawer}
       </Drawer>
+
+      {/* User Menu Dropdown */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        PaperProps={{
+          sx: {
+            mt: 1,
+            minWidth: 180,
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+            borderRadius: 2,
+            border: '1px solid rgba(0, 0, 0, 0.05)'
+          }
+        }}
+      >
+        <MenuItem onClick={() => { handleNavigation('/dashboard'); handleMenuClose(); }}>
+          <ListItemIcon>
+            <PersonIcon fontSize="small" />
+          </ListItemIcon>
+          Profile
+        </MenuItem>
+        <MenuItem 
+          onClick={handleLogout}
+          sx={{ 
+            color: '#ef4444',
+            '&:hover': {
+              backgroundColor: '#fef2f2'
+            }
+          }}
+        >
+          <ListItemIcon>
+            <LogoutIcon fontSize="small" sx={{ color: '#ef4444' }} />
+          </ListItemIcon>
+          Logout
+        </MenuItem>
+      </Menu>
     </>
   );
 };
