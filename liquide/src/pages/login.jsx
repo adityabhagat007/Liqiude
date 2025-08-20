@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -14,6 +15,8 @@ import {
   StepLabel
 } from '@mui/material';
 import { Phone, Lock } from '@mui/icons-material';
+import { authAPI } from '../services/api';
+import { ROUTES } from '../utils/config';
 
 const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -21,6 +24,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handlePhoneChange = (e) => {
     const value = e.target.value;
@@ -55,13 +59,13 @@ const Login = () => {
     setError('');
 
     try {
-      // Simulate API call to send OTP
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Call the real API to send OTP
+      await authAPI.sendOTP(phoneNumber);
       setIsOtpSent(true);
       console.log('OTP sent to:', phoneNumber);
     } catch (error) {
       console.log(error);
-      setError('Failed to send OTP. Please try again.');
+      setError(error.message || 'Failed to send OTP. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -82,14 +86,15 @@ const Login = () => {
     setError('');
 
     try {
-      // Simulate API call to verify OTP
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('OTP verified:', otp);
-      // Handle successful login here
-      // Navigate to dashboard or home page
+      // Call the real API to verify OTP and get tokens
+      const response = await authAPI.verifyOTP(phoneNumber, otp);
+      console.log('Login successful:', response);
+      
+      // Redirect to dashboard after successful login
+      navigate(ROUTES.DASHBOARD, { replace: true });
     } catch (error) {
       console.log(error);
-      setError('Invalid OTP. Please try again.');
+      setError(error.message || 'Invalid OTP. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -100,13 +105,13 @@ const Login = () => {
     setError('');
 
     try {
-      // Simulate API call to resend OTP
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Call the real API to resend OTP
+      await authAPI.sendOTP(phoneNumber);
       console.log('OTP resent to:', phoneNumber);
       setError('');
     } catch (error) {
       console.log(error);
-      setError('Failed to resend OTP. Please try again.');
+      setError(error.message || 'Failed to resend OTP. Please try again.');
     } finally {
       setIsLoading(false);
     }

@@ -1,5 +1,6 @@
 import PublicLayout from '../layouts/publicLayout';
-import Login from '../pages/Login';
+import Login from '../pages/login';
+import Dashboard from '../pages/Dashboard';
 
 // Public route configuration
 export const publicRoutes = [
@@ -7,7 +8,7 @@ export const publicRoutes = [
     path: "/",
     element: (
       <PublicLayout>
-        <div>Dashboard Page (Public)</div>
+        <div>Home Page (Public)</div>
       </PublicLayout>
     ),
   },
@@ -45,15 +46,27 @@ export const publicRoutes = [
 export const privateRoutes = [
   {
     path: "/dashboard",
-    element: <div>Dashboard Page (Private)</div>,
+    element: (
+      <PublicLayout>
+        <Dashboard />
+      </PublicLayout>
+    ),
   },
   {
     path: "/profile",
-    element: <div>Profile Page (Private)</div>,
+    element: (
+      <PublicLayout>
+        <div>Profile Page (Private)</div>
+      </PublicLayout>
+    ),
   },
   {
     path: "/settings",
-    element: <div>Settings Page (Private)</div>,
+    element: (
+      <PublicLayout>
+        <div>Settings Page (Private)</div>
+      </PublicLayout>
+    ),
   }
 ];
 

@@ -1,16 +1,11 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-
-// Helper function to check if user is authenticated
-const isAuthenticated = () => {
-  // Replace this with your actual authentication logic
-  // For example: return localStorage.getItem('token') !== null;
-  return false; // Default to false for security
-};
+import { isAuthenticated } from '../services/api';
+import { ROUTES } from '../utils/config';
 
 const PrivateRoutes = () => {
   if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={ROUTES.LOGIN} replace />;
   }
   
   return <Outlet />;
